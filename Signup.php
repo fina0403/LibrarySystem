@@ -77,6 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php if (!empty($error_message)): ?>
             <p class="text-danger text-center mt-3"><?php echo $error_message; ?></p>
         <?php endif; ?>
+
+        <!-- Back to Login Button -->
+        <div class="text-center mt-3">
+            <a href="Login.php" class="btn btn-secondary">Back to Login</a>
+        </div>
     </div>
 </body>
 </html>
