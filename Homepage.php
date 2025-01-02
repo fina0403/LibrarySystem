@@ -1,9 +1,19 @@
+<?php
+session_start();
+
+// Check if user is logged in, if not redirect to Login page
+if (!isset($_SESSION['username'])) {
+    header("Location: Login.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Management System - Home</title>
+    <title>Library Management System - Student Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -29,7 +39,8 @@
                         <a class="nav-link" href="BorrowReservation.php">Borrow/Reserve</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="Admin.php">Admin</a>
+                        <!-- Logout Link -->
+                        <a class="nav-link" href="Logout.php">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -39,14 +50,13 @@
     <!-- Main Content -->
     <div class="container mt-5">
         <div class="jumbotron text-center">
-            <h1 class="display-4">Welcome to the Library Management System</h1>
+            <h1 class="display-4">Welcome to Your Dashboard</h1>
             <p class="lead">
-                The Library Management System streamlines access to books, user accounts, and administrative tools. 
-                Explore our catalog, manage your account, view book details, and make borrow or reservation requests.
+                Explore the Library Management System! From browsing the catalog to managing your account and reserving books, everything is at your fingertips.
             </p>
             <hr class="my-4">
             <p>
-                Use the navigation menu above to explore the features of the system.
+                Use the navigation menu above to access the system's features.
             </p>
         </div>
     </div>
