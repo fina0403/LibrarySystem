@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 02, 2025 at 09:59 PM
+-- Generation Time: Jan 02, 2025 at 11:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -57,19 +57,19 @@ CREATE TABLE `book_borrowings` (
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` enum('admin','user') DEFAULT 'user'
+  `role` enum('admin','user') DEFAULT 'user',
+  `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES
-(2, 'Eshra', '$2y$10$OCQMLUDXl5GysWfQaN2e/.1AcvqEsqWzpQHK1v7iFbKwjU8OPDKDq', 'user'),
-(3, 'John', '$2y$10$oX32tOc49ad.D/dpUpWU8OT/9cgeVXnlaX7G7i3yOE1h6M09BihPi', 'user');
+INSERT INTO `users` (`username`, `password`, `role`, `user_id`) VALUES
+('Eshra', '$2y$10$OCQMLUDXl5GysWfQaN2e/.1AcvqEsqWzpQHK1v7iFbKwjU8OPDKDq', 'user', 1),
+('John', '$2y$10$oX32tOc49ad.D/dpUpWU8OT/9cgeVXnlaX7G7i3yOE1h6M09BihPi', 'user', 2);
 
 --
 -- Indexes for dumped tables
@@ -93,7 +93,7 @@ ALTER TABLE `book_borrowings`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `username` (`username`);
 
 --
@@ -116,7 +116,7 @@ ALTER TABLE `book_borrowings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -126,7 +126,7 @@ ALTER TABLE `users`
 -- Constraints for table `book_borrowings`
 --
 ALTER TABLE `book_borrowings`
-  ADD CONSTRAINT `book_borrowings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `book_borrowings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `book_borrowings_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`);
 COMMIT;
 
