@@ -1,24 +1,30 @@
 <?php
 session_start();
-require 'my_db_connection.php';
+require 'db_connect.php'; 
 
-// Initialize search term variable
-$searchTerm = '';
 
-// Check if search term is submitted
-if (isset($_POST['search'])) {
-    $searchTerm = $_POST['search'];
-}
-
-// Fetch books from the database based on search term
 try {
-    $query = "SELECT * FROM books WHERE title LIKE :search OR author LIKE :search OR genre LIKE :search";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute(['search' => '%' . $searchTerm . '%']);
+    $stmt = $pdo->prepare("SELECT * FROM books");
+    $stmt->execute();
     $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     echo "Error fetching book details: " . $e->getMessage();
     exit();
+}
+
+
+$search_query = '';
+if (isset($_POST['search'])) {
+    $search_query = $_POST['search'];
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM books WHERE title LIKE :search OR author LIKE :search OR genre LIKE :search");
+        $stmt->bindValue(':search', '%' . $search_query . '%');
+        $stmt->execute();
+        $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        echo "Error searching books: " . $e->getMessage();
+        exit();
+    }
 }
 ?>
 
@@ -50,19 +56,23 @@ try {
         </div>
     </nav>
 
-    <!-- Search Form -->
+    <!-- Search Bar -->
+    <div class="container mt-4">
+        <form method="POST" action="BookDetails.php">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Search by title, author, or genre" value="<?php echo htmlspecialchars($search_query); ?>">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Content -->
     <div class="container mt-5">
         <h1 class="text-center">Book Details</h1>
-        <form method="POST" class="d-flex justify-content-center mb-4">
-            <input type="text" name="search" class="form-control w-50" placeholder="Search by title, author, or genre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-            <button type="submit" class="btn btn-primary ms-2">Search</button>
-        </form>
 
         <!-- Display all books -->
         <div class="row">
-            <?php if (empty($books)): ?>
-                <p class="text-center">No books found matching your search.</p>
-            <?php else: ?>
+            <?php if (count($books) > 0): ?>
                 <?php foreach ($books as $book): ?>
                     <div class="col-md-4 mb-4">
                         <div class="card">
@@ -103,6 +113,8 @@ try {
                         </div>
                     </div>
                 <?php endforeach; ?>
+            <?php else: ?>
+                <p class="text-center">No books found matching your search.</p>
             <?php endif; ?>
         </div>
     </div>
