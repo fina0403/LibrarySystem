@@ -1,0 +1,120 @@
+<?php
+session_start();
+require 'my_db_connection.php';
+
+// Initialize search term variable
+$searchTerm = '';
+
+// Check if search term is submitted
+if (isset($_POST['search'])) {
+    $searchTerm = $_POST['search'];
+}
+
+// Fetch books from the database based on search term
+try {
+    $query = "SELECT * FROM books WHERE title LIKE :search OR author LIKE :search OR genre LIKE :search";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['search' => '%' . $searchTerm . '%']);
+    $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    echo "Error fetching book details: " . $e->getMessage();
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Book Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="Homepage.php">Library Management System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="Catalog.php">Catalog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="UserAccount.php">User Account</a></li>
+                    <li class="nav-item"><a class="nav-link" href="BookDetails.php">Book Details</a></li>
+                    <li class="nav-item"><a class="nav-link" href="BorrowReservation.php">Borrow/Reserve</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Logout.php">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Form -->
+    <div class="container mt-5">
+        <h1 class="text-center">Book Details</h1>
+        <form method="POST" class="d-flex justify-content-center mb-4">
+            <input type="text" name="search" class="form-control w-50" placeholder="Search by title, author, or genre" value="<?php echo htmlspecialchars($searchTerm); ?>" />
+            <button type="submit" class="btn btn-primary ms-2">Search</button>
+        </form>
+
+        <!-- Display all books -->
+        <div class="row">
+            <?php if (empty($books)): ?>
+                <p class="text-center">No books found matching your search.</p>
+            <?php else: ?>
+                <?php foreach ($books as $book): ?>
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <?php echo htmlspecialchars($book['title']); ?>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Author:</strong> <?php echo htmlspecialchars($book['author']); ?></p>
+                                <p><strong>Genre:</strong> <?php echo htmlspecialchars($book['genre'] ?? 'Unknown'); ?></p>
+                                <p><strong>ISBN:</strong> <?php echo htmlspecialchars($book['isbn']); ?></p>
+                                <p><strong>Availability:</strong> 
+                                    <?php echo $book['quantity'] > 0 ? 'Available' : 'Out of Stock'; ?>
+                                </p>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookModal<?php echo $book['book_id']; ?>">
+                                    View Synopsis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal for Synopsis -->
+                    <div class="modal fade" id="bookModal<?php echo $book['book_id']; ?>" tabindex="-1" aria-labelledby="modalLabel<?php echo $book['book_id']; ?>" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalLabel<?php echo $book['book_id']; ?>">
+                                        <?php echo htmlspecialchars($book['title']); ?> - Synopsis
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <?php echo nl2br(htmlspecialchars($book['synopsis'] ?? 'No synopsis available.')); ?>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-lg-start mt-auto py-3">
+        <div class="text-center p-3">
+            &copy; <?php echo date('Y'); ?> Library Management System. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
