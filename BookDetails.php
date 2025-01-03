@@ -2,29 +2,18 @@
 session_start();
 require 'db_connect.php'; 
 
+// Fetch all books from the database
+$sql = "SELECT * FROM books";
+$result = $conn->query($sql);
 
-try {
-    $stmt = $pdo->prepare("SELECT * FROM books");
-    $stmt->execute();
-    $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    echo "Error fetching book details: " . $e->getMessage();
-    exit();
-}
-
-
-$search_query = '';
-if (isset($_POST['search'])) {
-    $search_query = $_POST['search'];
-    try {
-        $stmt = $pdo->prepare("SELECT * FROM books WHERE title LIKE :search OR author LIKE :search OR genre LIKE :search");
-        $stmt->bindValue(':search', '%' . $search_query . '%');
-        $stmt->execute();
-        $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (Exception $e) {
-        echo "Error searching books: " . $e->getMessage();
-        exit();
+if ($result->num_rows > 0) {
+    // Store the books in an array
+    $books = [];
+    while($row = $result->fetch_assoc()) {
+        $books[] = $row;
     }
+} else {
+    echo "No books found.";
 }
 ?>
 
@@ -56,66 +45,52 @@ if (isset($_POST['search'])) {
         </div>
     </nav>
 
-    <!-- Search Bar -->
-    <div class="container mt-4">
-        <form method="POST" action="BookDetails.php">
-            <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Search by title, author, or genre" value="<?php echo htmlspecialchars($search_query); ?>">
-                <button class="btn btn-outline-primary" type="submit">Search</button>
-            </div>
-        </form>
-    </div>
-
     <!-- Main Content -->
     <div class="container mt-5">
         <h1 class="text-center">Book Details</h1>
 
         <!-- Display all books -->
         <div class="row">
-            <?php if (count($books) > 0): ?>
-                <?php foreach ($books as $book): ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
-                            <div class="card-header bg-primary text-white">
-                                <?php echo htmlspecialchars($book['title']); ?>
-                            </div>
-                            <div class="card-body">
-                                <p><strong>Author:</strong> <?php echo htmlspecialchars($book['author']); ?></p>
-                                <p><strong>Genre:</strong> <?php echo htmlspecialchars($book['genre'] ?? 'Unknown'); ?></p>
-                                <p><strong>ISBN:</strong> <?php echo htmlspecialchars($book['isbn']); ?></p>
-                                <p><strong>Availability:</strong> 
-                                    <?php echo $book['quantity'] > 0 ? 'Available' : 'Out of Stock'; ?>
-                                </p>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookModal<?php echo $book['book_id']; ?>">
-                                    View Synopsis
-                                </button>
-                            </div>
+            <?php foreach ($books as $book): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <?php echo htmlspecialchars($book['title']); ?>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Author:</strong> <?php echo htmlspecialchars($book['author']); ?></p>
+                            <p><strong>Genre:</strong> <?php echo htmlspecialchars($book['genre'] ?? 'Unknown'); ?></p>
+                            <p><strong>ISBN:</strong> <?php echo htmlspecialchars($book['isbn']); ?></p>
+                            <p><strong>Availability:</strong> 
+                                <?php echo $book['quantity'] > 0 ? 'Available' : 'Out of Stock'; ?>
+                            </p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookModal<?php echo $book['book_id']; ?>">
+                                View Synopsis
+                            </button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Modal for Synopsis -->
-                    <div class="modal fade" id="bookModal<?php echo $book['book_id']; ?>" tabindex="-1" aria-labelledby="modalLabel<?php echo $book['book_id']; ?>" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="modalLabel<?php echo $book['book_id']; ?>">
-                                        <?php echo htmlspecialchars($book['title']); ?> - Synopsis
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <?php echo nl2br(htmlspecialchars($book['synopsis'] ?? 'No synopsis available.')); ?>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
+                <!-- Modal for Synopsis -->
+                <div class="modal fade" id="bookModal<?php echo $book['book_id']; ?>" tabindex="-1" aria-labelledby="modalLabel<?php echo $book['book_id']; ?>" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalLabel<?php echo $book['book_id']; ?>">
+                                    <?php echo htmlspecialchars($book['title']); ?> - Synopsis
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <?php echo nl2br(htmlspecialchars($book['synopsis'] ?? 'No synopsis available.')); ?>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-center">No books found matching your search.</p>
-            <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
