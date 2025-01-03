@@ -1,16 +1,15 @@
 <?php
 session_start();
 
-// Check if the user is logged in as admin, if not, redirect to login page
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
     header("Location: Login.php");
     exit();
 }
 
-// Include database connection
-include('db_connect.php'); // Include the connection file
 
-// Fetch the book details if the 'id' parameter is set
+include('db_connect.php'); 
+
+// Fetch the book details
 if (isset($_GET['id'])) {
     $book_id = $_GET['id'];
     $stmt = $conn->prepare("SELECT `book_id`, `title`, `author`, `isbn`, `quantity` FROM books WHERE book_id = ?");
@@ -21,12 +20,12 @@ if (isset($_GET['id'])) {
     if ($result->num_rows > 0) {
         $book = $result->fetch_assoc();
     } else {
-        header("Location: Admin.php"); // Redirect to Admin page if the book is not found
+        header("Location: Admin.php");
         exit();
     }
     $stmt->close();
 } else {
-    header("Location: Admin.php"); // Redirect to Admin page if 'id' parameter is not set
+    header("Location: Admin.php"); 
     exit();
 }
 
@@ -61,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
         function cancelAction() {
-            window.location.href = 'Admin.php'; // Redirect to Admin.php
+            window.location.href = 'Admin.php'; 
         }
     </script>
 </head>
@@ -72,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container mt-5">
         <h2>Edit Book</h2>
 
-        <!-- Show message notification -->
         <?php if (isset($message)): ?>
             <div class="alert alert-<?php echo ($message_type == 'success') ? 'success' : 'danger'; ?>" role="alert">
                 <?php echo $message; ?>

@@ -1,14 +1,12 @@
 <?php
 session_start();
 
-// Check if the user is logged in as admin, if not, redirect to login page
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
     header("Location: Login.php");
     exit();
 }
 
-// Include database connection
-include('db_connect.php'); // Include the connection file
+include('db_connect.php'); 
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -20,11 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("INSERT INTO books (`title`, `author`, `isbn`, `quantity`) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("sssi", $title, $author, $isbn, $quantity);
     if ($stmt->execute()) {
-        // Notify user but stay on the same page
         $message = "Book added successfully!";
         $message_type = "success";
     } else {
-        // Notify user but stay on the same page
         $message = "Error adding book: " . $stmt->error;
         $message_type = "error";
     }
@@ -40,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
         function cancelAction() {
-            window.location.href = 'Admin.php'; // Redirect to Admin.php
+            window.location.href = 'Admin.php'; 
         }
     </script>
 </head>
@@ -51,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container mt-5">
         <h2>Add Book</h2>
         
-        <!-- Show message notification -->
         <?php if (isset($message)): ?>
             <div class="alert alert-<?php echo ($message_type == 'success') ? 'success' : 'danger'; ?>" role="alert">
                 <?php echo $message; ?>

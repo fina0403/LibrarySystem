@@ -36,7 +36,7 @@ $result = $conn->query($sql);
         }
 
         .footer {
-            margin-top: auto; /* Push footer to the bottom */
+            margin-top: auto; 
         }
     </style>
 </head>
@@ -60,7 +60,6 @@ $result = $conn->query($sql);
                         <a class="nav-link" href="ManageUsers.php">Manage User</a>
                     </li>
                     <li class="nav-item">
-                        <!-- Logout Link -->
                         <a class="nav-link" href="Logout.php">Logout</a>
                     </li>
                 </ul>
@@ -68,7 +67,7 @@ $result = $conn->query($sql);
         </div>
     </nav>
 
-    <!-- Main Content Wrapper -->
+   
     <div class="content-wrapper container mt-5">
         <!-- Welcome Section -->
         <div class="jumbotron text-center mb-4">
@@ -102,7 +101,6 @@ $result = $conn->query($sql);
             <tbody id="bookTableBody">
                 <?php
                 if ($result->num_rows > 0) {
-                    // Output data for each row
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['book_id']) . "</td>";
@@ -117,7 +115,7 @@ $result = $conn->query($sql);
                                 <a href='AdminDeleteBook.php?id=" . $row['book_id'] . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this book?\")'>
                                     <i class='bi bi-trash'></i> Delete
                                 </a>
-                              </td>"; // Edit & Delete buttons with icons
+                              </td>"; 
                         echo "</tr>";
                     }
                 } else {
@@ -138,6 +136,6 @@ $result = $conn->query($sql);
 </body>
 </html>
 <?php
-// Close database connection
+
 $conn->close();
 ?>
