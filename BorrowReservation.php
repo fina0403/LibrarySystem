@@ -2,23 +2,19 @@
 session_start();
 include 'db_connect.php';
 
-// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: Login.php");
     exit();
 }
 
-// Fetch available books
 $sql = "SELECT * FROM books WHERE quantity > 0";
 $result = $conn->query($sql);
 
-// Handle borrow or reserve actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $book_id = $_POST['book_id'];
-    $action = $_POST['action']; // Borrow or Reserve
+    $action = $_POST['action'];
     $username = $_SESSION['username'];
 
-    // Get user ID
     $user_sql = "SELECT user_id FROM users WHERE username = ?";
     $stmt = $conn->prepare($user_sql);
     $stmt->bind_param("s", $username);
@@ -28,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $user['user_id'];
     $stmt->close();
 
-    // Borrow or Reserve
     if ($action === 'borrow') {
         $borrow_sql = "INSERT INTO book_borrowings (user_id, book_id, status) VALUES (?, ?, 'borrowed')";
         $update_sql = "UPDATE books SET quantity = quantity - 1 WHERE book_id = ?";
